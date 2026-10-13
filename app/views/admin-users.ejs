@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Kelola Admin - Jhon Seafood 68</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="admin-body">
+<header class="admin-header">
+  <h1>🦐 Jhon Seafood 68 — Admin</h1>
+  <div>
+    <span>Halo, <%= username %></span>
+    <form method="POST" action="/admin/logout" style="display:inline">
+      <button type="submit" class="btn-logout">Logout</button>
+    </form>
+  </div>
+</header>
+
+<main class="admin-main">
+  <div class="admin-toolbar">
+    <a href="/admin/dashboard" class="btn-secondary">&larr; Kelola Produk</a>
+    <a href="/admin/orders" class="btn-secondary">📋 Pesanan</a>
+    <a href="/admin/profile" class="btn-secondary">🔑 Ganti Password</a>
+  </div>
+
+  <h2>Kelola Akun Admin</h2>
+  <% if (error) { %><p class="error"><%= error %></p><% } %>
+
+  <table class="admin-table">
+    <thead><tr><th>Username</th><th>Dibuat</th><th>Aksi</th></tr></thead>
+    <tbody>
+      <% users.forEach(u => { %>
+      <tr>
+        <td><%= u.username %> <% if (u.id === currentId) { %><span class="status-badge">Kamu</span><% } %></td>
+        <td><%= u.created_at %></td>
+        <td class="actions">
+          <% if (u.id !== currentId) { %>
+          <form method="POST" action="/admin/users/<%= u.id %>/delete" onsubmit="return confirm('Hapus admin ini?')" style="display:inline">
+            <button type="submit" class="btn-delete">Hapus</button>
+          </form>
+          <% } else { %>
+            &mdash;
+          <% } %>
+        </td>
+      </tr>
+      <% }) %>
+    </tbody>
+  </table>
+
+  <h2 style="margin-top:30px;">Tambah Admin Baru</h2>
+  <form method="POST" action="/admin/users/new" class="product-form">
+    <label>Username</label>
+    <input type="text" name="username" required autocomplete="off">
+    <label>Password (minimal 8 karakter)</label>
+    <input type="password" name="password" required minlength="8">
+    <div class="form-actions">
+      <button type="submit" class="btn-primary">Tambah Admin</button>
+    </div>
+  </form>
+</main>
+</body>
+</html>

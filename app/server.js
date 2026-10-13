@@ -36,6 +36,23 @@ async function main() {
       qty INTEGER NOT NULL
     )
   `);
+  db.run(`
+    CREATE TABLE IF NOT EXISTS admin_users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      username TEXT NOT NULL UNIQUE,
+      password_hash TEXT NOT NULL,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  // Migrate initial admin from .env (only runs once, when admin_users is empty)
+  const adminCount = db.get('SELECT COUNT(*) AS c FROM admin_users').c;
+  if (adminCount === 0) {
+    const envUser = process.env.ADMIN_USERNAME || 'admin';
+    const envHash = process.env.ADMIN_PASSWORD_HASH || bcrypt.hashSync('admin123', 10);
+    db.run('INSERT INTO admin_users (username, password_hash) VALUES (?, ?)', [envUser, envHash]);
+    console.log(`Migrated initial admin user "${envUser}" from .env into database`);
+  }
 
   // Seed once if empty
   const count = db.get('SELECT COUNT(*) AS c FROM products').c;
@@ -176,12 +193,12 @@ async function main() {
 
   app.post('/admin/login', (req, res) => {
     const { username, password } = req.body;
-    const adminUser = process.env.ADMIN_USERNAME || 'admin';
-    const adminHash = process.env.ADMIN_PASSWORD_HASH || '';
+    const admin = db.get('SELECT * FROM admin_users WHERE username = ?', [username || '']);
 
-    if (username === adminUser && bcrypt.compareSync(password || '', adminHash)) {
+    if (admin && bcrypt.compareSync(password || '', admin.password_hash)) {
       req.session.isAdmin = true;
-      req.session.username = username;
+      req.session.username = admin.username;
+      req.session.adminId = admin.id;
       return res.redirect('/admin/dashboard');
     }
     res.render('login', { error: 'Username atau password salah' });
@@ -255,6 +272,69 @@ async function main() {
       db.run('UPDATE orders SET status = ? WHERE id = ?', [status, req.params.id]);
     }
     res.redirect('/admin/orders');
+  });
+
+  // --- Change own password ---
+  app.get('/admin/profile', requireAuth, (req, res) => {
+    res.render('admin-profile', { username: req.session.username, error: null, success: null });
+  });
+
+  app.post('/admin/profile/password', requireAuth, (req, res) => {
+    const { current_password, new_password, confirm_password } = req.body;
+    const admin = db.get('SELECT * FROM admin_users WHERE id = ?', [req.session.adminId]);
+
+    if (!admin || !bcrypt.compareSync(current_password || '', admin.password_hash)) {
+      return res.render('admin-profile', { username: req.session.username, error: 'Password lama salah', success: null });
+    }
+    if (!new_password || new_password.length < 8) {
+      return res.render('admin-profile', { username: req.session.username, error: 'Password baru minimal 8 karakter', success: null });
+    }
+    if (new_password !== confirm_password) {
+      return res.render('admin-profile', { username: req.session.username, error: 'Konfirmasi password tidak cocok', success: null });
+    }
+
+    const newHash = bcrypt.hashSync(new_password, 10);
+    db.run('UPDATE admin_users SET password_hash = ? WHERE id = ?', [newHash, admin.id]);
+    res.render('admin-profile', { username: req.session.username, error: null, success: 'Password berhasil diubah' });
+  });
+
+  // --- Manage admin users ---
+  app.get('/admin/users', requireAuth, (req, res) => {
+    const users = db.all('SELECT id, username, created_at FROM admin_users ORDER BY id');
+    res.render('admin-users', { users, username: req.session.username, currentId: req.session.adminId, error: null });
+  });
+
+  app.post('/admin/users/new', requireAuth, (req, res) => {
+    const { username, password } = req.body;
+    const users = db.all('SELECT id, username, created_at FROM admin_users ORDER BY id');
+
+    if (!username || !password || password.length < 8) {
+      return res.render('admin-users', { users, username: req.session.username, currentId: req.session.adminId, error: 'Username wajib diisi dan password minimal 8 karakter' });
+    }
+    const existing = db.get('SELECT id FROM admin_users WHERE username = ?', [username]);
+    if (existing) {
+      return res.render('admin-users', { users, username: req.session.username, currentId: req.session.adminId, error: 'Username sudah dipakai' });
+    }
+
+    const hash = bcrypt.hashSync(password, 10);
+    db.run('INSERT INTO admin_users (username, password_hash) VALUES (?, ?)', [username, hash]);
+    res.redirect('/admin/users');
+  });
+
+  app.post('/admin/users/:id/delete', requireAuth, (req, res) => {
+    const targetId = parseInt(req.params.id, 10);
+    const totalAdmins = db.get('SELECT COUNT(*) AS c FROM admin_users').c;
+    const users = db.all('SELECT id, username, created_at FROM admin_users ORDER BY id');
+
+    if (targetId === req.session.adminId) {
+      return res.render('admin-users', { users, username: req.session.username, currentId: req.session.adminId, error: 'Tidak bisa menghapus akun sendiri yang sedang login' });
+    }
+    if (totalAdmins <= 1) {
+      return res.render('admin-users', { users, username: req.session.username, currentId: req.session.adminId, error: 'Minimal harus ada 1 admin' });
+    }
+
+    db.run('DELETE FROM admin_users WHERE id = ?', [targetId]);
+    res.redirect('/admin/users');
   });
 
   app.listen(PORT, () => {

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Ganti Password - Jhon Seafood 68</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="admin-body">
+<header class="admin-header">
+  <h1>🦐 Jhon Seafood 68 — Admin</h1>
+  <div>
+    <span>Halo, <%= username %></span>
+    <form method="POST" action="/admin/logout" style="display:inline">
+      <button type="submit" class="btn-logout">Logout</button>
+    </form>
+  </div>
+</header>
+
+<main class="admin-main">
+  <div class="admin-toolbar">
+    <a href="/admin/dashboard" class="btn-secondary">&larr; Kelola Produk</a>
+    <a href="/admin/orders" class="btn-secondary">📋 Pesanan</a>
+    <a href="/admin/users" class="btn-secondary">👤 Kelola Admin</a>
+  </div>
+
+  <h2>Ganti Password</h2>
+  <% if (error) { %><p class="error"><%= error %></p><% } %>
+  <% if (success) { %><p class="success"><%= success %></p><% } %>
+
+  <form method="POST" action="/admin/profile/password" class="product-form">
+    <label>Password Lama</label>
+    <input type="password" name="current_password" required>
+    <label>Password Baru (minimal 8 karakter)</label>
+    <input type="password" name="new_password" required minlength="8">
+    <label>Konfirmasi Password Baru</label>
+    <input type="password" name="confirm_password" required minlength="8">
+    <div class="form-actions">
+      <button type="submit" class="btn-primary">Simpan Password Baru</button>
+    </div>
+  </form>
+</main>
+</body>
+</html>
