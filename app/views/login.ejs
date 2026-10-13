@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Admin Login - Jhon Seafood 68</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="admin-body">
+  <div class="login-box">
+    <div class="logo">🦐</div>
+    <h1>Admin Jhon Seafood 68</h1>
+    <% if (error) { %>
+      <p class="error"><%= error %></p>
+    <% } %>
+    <form method="POST" action="/admin/login">
+      <label>Username</label>
+      <input type="text" name="username" required autofocus>
+      <label>Password</label>
+      <input type="password" name="password" required>
+      <button type="submit">Login</button>
+    </form>
+    <p class="back-link"><a href="/">&larr; Kembali ke halaman utama</a></p>
+  </div>
+</body>
+</html>

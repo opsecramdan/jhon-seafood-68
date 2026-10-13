@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jhon Seafood 68</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<header class="hero">
+  <div class="logo">🦐</div>
+  <h1>Jhon Seafood 68</h1>
+  <p class="tagline">Seafood segar, dimasak langsung dari pemesanan Anda — kini bisa dipesan online kapan saja.</p>
+</header>
+
+<main>
+  <section class="about">
+    <h2>Tentang Kami</h2>
+    <p>
+      Jhon Seafood 68 adalah rumah makan seafood keluarga yang melayani pelanggan dengan menu
+      kerang, udang, cumi, ikan bakar, hingga kepiting segar. Sistem pemesanan kami kini
+      sudah bermigrasi ke cloud agar pelanggan dapat melihat menu kapan saja, di mana saja,
+      dengan data yang aman dan tersimpan di server yang andal.
+    </p>
+  </section>
+
+  <% Object.keys(grouped).forEach(category => { %>
+  <section class="menu">
+    <h2><%= category %></h2>
+    <div class="menu-grid">
+      <% grouped[category].forEach(p => { %>
+      <div class="menu-item">
+        <% if (p.image) { %>
+          <img src="<%= p.image %>" alt="<%= p.name %>" class="menu-img">
+        <% } else { %>
+          <div class="menu-img placeholder">🦐</div>
+        <% } %>
+        <h3><%= p.name %></h3>
+        <p class="desc"><%= p.description %></p>
+        <span class="price">Rp <%= p.price.toLocaleString('id-ID') %></span>
+      </div>
+      <% }) %>
+    </div>
+  </section>
+  <% }) %>
+
+  <section class="contact">
+    <h2>Kontak &amp; Lokasi</h2>
+    <p>Buka setiap hari &middot; Pemesanan online tersedia 24 jam melalui website ini.</p>
+  </section>
+</main>
+
+<footer>
+  <p><strong>Kelompok K-1 &mdash; Tugas Praktikum Cloud Computing</strong></p>
+  <p>Deka Ramdoni &bull; Gopriadi &bull; Muhammad Daffa Cahyo Santoso &bull; Muhammad Ramadan</p>
+  <p class="admin-link"><a href="/admin/login">Admin</a></p>
+</footer>
+
+</body>
+</html>

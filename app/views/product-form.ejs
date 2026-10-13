@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title><%= product ? 'Edit' : 'Tambah' %> Produk - Jhon Seafood 68</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="admin-body">
+<header class="admin-header">
+  <h1>🦐 Jhon Seafood 68 — Admin</h1>
+</header>
+<main class="admin-main">
+  <h2><%= product ? 'Edit Produk' : 'Tambah Produk Baru' %></h2>
+  <% if (error) { %><p class="error"><%= error %></p><% } %>
+
+  <form method="POST"
+        action="<%= product ? '/admin/products/' + product.id + '/edit' : '/admin/products/new' %>"
+        enctype="multipart/form-data" class="product-form">
+
+    <label>Nama Produk</label>
+    <input type="text" name="name" value="<%= product ? product.name : '' %>" required>
+
+    <label>Kategori</label>
+    <input type="text" name="category" value="<%= product ? product.category : '' %>" required>
+
+    <label>Harga (Rp)</label>
+    <input type="number" name="price" value="<%= product ? product.price : '' %>" required min="0">
+
+    <label>Deskripsi</label>
+    <textarea name="description" rows="3"><%= product ? product.description : '' %></textarea>
+
+    <label>Gambar Produk <%= product && product.image ? '(kosongkan jika tidak ingin ganti)' : '' %></label>
+    <% if (product && product.image) { %>
+      <img src="<%= product.image %>" class="thumb" style="display:block;margin-bottom:8px;">
+    <% } %>
+    <input type="file" name="image" accept="image/png,image/jpeg,image/webp">
+
+    <div class="form-actions">
+      <button type="submit" class="btn-primary">Simpan</button>
+      <a href="/admin/dashboard" class="btn-secondary">Batal</a>
+    </div>
+  </form>
+</main>
+</body>
+</html>

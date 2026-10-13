@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Dashboard Admin - Jhon Seafood 68</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="admin-body">
+<header class="admin-header">
+  <h1>🦐 Jhon Seafood 68 — Admin</h1>
+  <div>
+    <span>Halo, <%= username %></span>
+    <form method="POST" action="/admin/logout" style="display:inline">
+      <button type="submit" class="btn-logout">Logout</button>
+    </form>
+  </div>
+</header>
+
+<main class="admin-main">
+  <div class="admin-toolbar">
+    <a href="/admin/products/new" class="btn-primary">+ Tambah Produk</a>
+    <a href="/" target="_blank" class="btn-secondary">Lihat Halaman Publik</a>
+  </div>
+
+  <table class="admin-table">
+    <thead>
+      <tr><th>Gambar</th><th>Nama</th><th>Kategori</th><th>Harga</th><th>Aksi</th></tr>
+    </thead>
+    <tbody>
+      <% products.forEach(p => { %>
+      <tr>
+        <td>
+          <% if (p.image) { %>
+            <img src="<%= p.image %>" class="thumb">
+          <% } else { %>
+            <span class="thumb placeholder">🦐</span>
+          <% } %>
+        </td>
+        <td><%= p.name %></td>
+        <td><%= p.category %></td>
+        <td>Rp <%= p.price.toLocaleString('id-ID') %></td>
+        <td class="actions">
+          <a href="/admin/products/<%= p.id %>/edit">Edit</a>
+          <form method="POST" action="/admin/products/<%= p.id %>/delete" onsubmit="return confirm('Hapus produk ini?')" style="display:inline">
+            <button type="submit" class="btn-delete">Hapus</button>
+          </form>
+        </td>
+      </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</main>
+</body>
+</html>

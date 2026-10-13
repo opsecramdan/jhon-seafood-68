@@ -1,0 +1,63 @@
+[
+  {"name": "Kerang Dara Rebus", "category": "Kerang Dara", "price": 25000, "description": "Kerang dara segar direbus sederhana, rasa alami."},
+  {"name": "Kerang Dara Goreng", "category": "Kerang Dara", "price": 35000, "description": "Kerang dara digoreng garing."},
+  {"name": "Kerang Dara Saus Padang", "category": "Kerang Dara", "price": 35000, "description": "Kerang dara disiram saus padang pedas gurih."},
+  {"name": "Kerang Dara Saus Tiram", "category": "Kerang Dara", "price": 35000, "description": "Kerang dara dimasak saus tiram khas rumahan."},
+  {"name": "Kerang Dara Asam Manis", "category": "Kerang Dara", "price": 35000, "description": "Kerang dara dengan saus asam manis segar."},
+  {"name": "Kerang Dara Mentega", "category": "Kerang Dara", "price": 35000, "description": "Kerang dara ditumis mentega harum."},
+  {"name": "Kerang Dara Lada Hitam", "category": "Kerang Dara", "price": 35000, "description": "Kerang dara dengan saus lada hitam pedas."},
+
+  {"name": "Kerang Hijau Rebus", "category": "Kerang Hijau", "price": 25000, "description": "Kerang hijau segar direbus sederhana."},
+  {"name": "Kerang Hijau Goreng", "category": "Kerang Hijau", "price": 35000, "description": "Kerang hijau digoreng garing."},
+  {"name": "Kerang Hijau Saus Padang", "category": "Kerang Hijau", "price": 35000, "description": "Kerang hijau disiram saus padang pedas."},
+  {"name": "Kerang Hijau Saus Tiram", "category": "Kerang Hijau", "price": 35000, "description": "Kerang hijau dimasak saus tiram."},
+  {"name": "Kerang Hijau Asam Manis", "category": "Kerang Hijau", "price": 35000, "description": "Kerang hijau dengan saus asam manis."},
+  {"name": "Kerang Hijau Mentega", "category": "Kerang Hijau", "price": 35000, "description": "Kerang hijau ditumis mentega."},
+  {"name": "Kerang Hijau Lada Hitam", "category": "Kerang Hijau", "price": 35000, "description": "Kerang hijau saus lada hitam."},
+  {"name": "Kerang Hijau Telur Asin", "category": "Kerang Hijau", "price": 40000, "description": "Kerang hijau balut saus telur asin creamy."},
+
+  {"name": "Udang Rebus", "category": "Udang", "price": 42000, "description": "Udang segar direbus sederhana."},
+  {"name": "Udang Bakar", "category": "Udang", "price": 42000, "description": "Udang dibakar bumbu rempah."},
+  {"name": "Udang Goreng Tepung", "category": "Udang", "price": 42000, "description": "Udang crispy balut tepung renyah."},
+  {"name": "Udang Padang Padang", "category": "Udang", "price": 42000, "description": "Udang saus padang pedas khas."},
+  {"name": "Udang Saus Tiram", "category": "Udang", "price": 42000, "description": "Udang dimasak saus tiram."},
+  {"name": "Udang Asam Manis", "category": "Udang", "price": 42000, "description": "Udang dengan saus asam manis."},
+  {"name": "Udang Mentega", "category": "Udang", "price": 42000, "description": "Udang ditumis mentega harum."},
+  {"name": "Udang Lada Hitam", "category": "Udang", "price": 42000, "description": "Udang saus lada hitam pedas."},
+  {"name": "Udang Telur Asin", "category": "Udang", "price": 47000, "description": "Udang balut saus telur asin creamy."},
+
+  {"name": "Cumi Bakar", "category": "Cumi", "price": 42000, "description": "Cumi dibakar bumbu rempah."},
+  {"name": "Cumi Goreng Tepung", "category": "Cumi", "price": 42000, "description": "Cumi crispy balut tepung."},
+  {"name": "Cumi Saus Padang", "category": "Cumi", "price": 42000, "description": "Cumi saus padang pedas."},
+  {"name": "Cumi Saus Tiram", "category": "Cumi", "price": 42000, "description": "Cumi empuk saus tiram khas rumahan."},
+  {"name": "Cumi Asam Manis", "category": "Cumi", "price": 42000, "description": "Cumi dengan saus asam manis."},
+  {"name": "Cumi Mentega", "category": "Cumi", "price": 42000, "description": "Cumi ditumis mentega."},
+  {"name": "Cumi Lada Hitam", "category": "Cumi", "price": 42000, "description": "Cumi saus lada hitam pedas."},
+  {"name": "Cumi Telur Asin", "category": "Cumi", "price": 47000, "description": "Cumi balut saus telur asin creamy."},
+
+  {"name": "Cah Kangkung Polos", "category": "Sayur", "price": 15000, "description": "Kangkung tumis polos segar."},
+  {"name": "Cah Kangkung Terasi", "category": "Sayur", "price": 15000, "description": "Kangkung tumis bumbu terasi."},
+  {"name": "Cah Kangkung Seafood", "category": "Sayur", "price": 30000, "description": "Kangkung tumis dengan topping seafood."},
+  {"name": "Cah Tauge Ikan Asin", "category": "Sayur", "price": 15000, "description": "Tauge tumis dengan ikan asin gurih."},
+
+  {"name": "Ikan Bakar Bawal", "category": "Ikan", "price": 95000, "description": "Ikan bawal dibakar bumbu rempah khas."},
+  {"name": "Ikan Baronang", "category": "Ikan", "price": 95000, "description": "Ikan baronang segar, bisa goreng/bakar."},
+  {"name": "Ikan Kue Bakar", "category": "Ikan", "price": 95000, "description": "Ikan kue dibakar bumbu rempah."},
+  {"name": "Ikan Krapu", "category": "Ikan", "price": 95000, "description": "Ikan kerapu segar, bisa goreng/bakar."},
+  {"name": "Ikan Kakap Merah", "category": "Ikan", "price": 95000, "description": "Ikan kakap merah segar dibakar."},
+  {"name": "Ikan Gurame", "category": "Ikan", "price": 70000, "description": "Gurame segar, bisa digoreng atau dibakar."},
+
+  {"name": "Kepiting 1 Porsi", "category": "Kepiting", "price": 170000, "description": "Kepiting utuh dimasak saus favorit, porsi lengkap."},
+  {"name": "Kepiting Setengah Porsi", "category": "Kepiting", "price": 85000, "description": "Kepiting setengah porsi, saus favorit."},
+
+  {"name": "Nasi Putih", "category": "Pelengkap", "price": 6000, "description": "Nasi putih hangat, pelengkap menu utama."},
+  {"name": "Mineral", "category": "Minuman", "price": 5000, "description": "Air mineral dingin/segar."},
+  {"name": "Es Batu", "category": "Pelengkap", "price": 2000, "description": "Tambahan es batu."},
+
+  {"name": "Es Jeruk", "category": "Minuman", "price": 10000, "description": "Jeruk peras segar dengan es."},
+  {"name": "Jeruk Panas", "category": "Minuman", "price": 10000, "description": "Jeruk peras hangat."},
+  {"name": "Es Teh Manis", "category": "Minuman", "price": 5000, "description": "Teh manis dingin segar."},
+  {"name": "Teh Manis Panas", "category": "Minuman", "price": 5000, "description": "Teh manis hangat."},
+  {"name": "Es Teh Tawar", "category": "Minuman", "price": 3000, "description": "Teh tawar dingin."},
+  {"name": "Teh Tawar Hangat", "category": "Minuman", "price": 1000, "description": "Teh tawar hangat."}
+]
