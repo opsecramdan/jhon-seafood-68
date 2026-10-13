@@ -75,11 +75,14 @@ node -e "console.log(require('bcryptjs').hashSync('password-kamu', 10))"
 5. Jalankan app dengan PM2 (`pm2 start server.js --name jhonseafood`) agar auto-restart.
 6. Konfigurasi Nginx sebagai reverse proxy ke `localhost:3000`, dengan `location = /health`
    diteruskan langsung ke app (yang juga mengecek koneksi database).
-7. Pasang Elastic IP agar IP publik tetap, lalu arahkan domain gratis `<ip-dash>.nip.io` ke IP
-   tersebut (otomatis, tanpa setup DNS).
-8. Jalankan `certbot --nginx -d <ip-dash>.nip.io` untuk SSL gratis dari Let's Encrypt.
+7. Pasang Elastic IP agar IP publik tetap, lalu arahkan domain gratis custom di bawah domain
+   `nip.io` ke IP tersebut (format: `<nama>.<ip-dash>.nip.io`, otomatis resolve tanpa setup DNS).
+8. Jalankan `certbot --nginx -d <domain>.nip.io` untuk SSL gratis dari Let's Encrypt.
 9. Verifikasi: halaman utama tampil publik, `/health` → `OK`, `/admin/login` perlu kredensial,
    HTTPS aktif dengan sertifikat valid.
+
+**Domain production saat ini:** `https://jhon86.16-79-143-87.nip.io/`
+(alias lama `https://16-79-143-87.nip.io/` tetap aktif)
 
 ## Keamanan
 
