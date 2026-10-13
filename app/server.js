@@ -337,6 +337,14 @@ async function main() {
     res.redirect('/admin/users');
   });
 
+  // Bare "/admin" and any unknown /admin/* path -> send to login (or dashboard if already logged in)
+  app.get('/admin', (req, res) => {
+    res.redirect(req.session && req.session.isAdmin ? '/admin/dashboard' : '/admin/login');
+  });
+  app.all('/admin/*', (req, res) => {
+    res.redirect(req.session && req.session.isAdmin ? '/admin/dashboard' : '/admin/login');
+  });
+
   app.listen(PORT, () => {
     console.log(`Jhon Seafood 68 running on port ${PORT}`);
   });
