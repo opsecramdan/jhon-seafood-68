@@ -14,9 +14,12 @@ Aplikasi web untuk UMKM **Jhon Seafood 68**, dibuat untuk Tugas Praktikum Cloud 
 
 ## Fitur
 
-- **Halaman publik** (tanpa login): nama & deskripsi UMKM, menu lengkap (52 produk) dikelompokkan
+- **Halaman publik** (tanpa login): nama & deskripsi UMKM, menu lengkap (53 produk) dikelompokkan
   per kategori beserta harga, footer nomor kelompok & nama anggota.
-- **Admin panel** (`/admin/login`, perlu login): tambah/edit/hapus produk, upload gambar produk.
+- **Pemesanan online** (tanpa login): pelanggan tambah produk ke keranjang, isi nama + no. HP,
+  submit pesanan → tersimpan di database, halaman konfirmasi menampilkan ringkasan pesanan.
+- **Admin panel** (`/admin/login`, perlu login): tambah/edit/hapus produk + upload gambar,
+  lihat & ubah status pesanan masuk (`/admin/orders`).
 - **`/health`**: mengembalikan teks `OK` dan memeriksa koneksi database.
 - Password admin di-hash (bcrypt) dan disimpan di `.env` (tidak pernah ditulis di kode / repo).
 
