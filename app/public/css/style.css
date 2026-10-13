@@ -4,6 +4,7 @@
   --bg: #fff5ef;
   --text: #2b2b2b;
   --muted: #6b6b6b;
+  --content-width: clamp(1100px, 80vw, 1800px);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -23,7 +24,7 @@ body {
 .hero-banner {
   display: block;
   width: 100%;
-  max-width: 1100px;
+  max-width: var(--content-width);
   height: auto;
   margin: 0 auto;
 }
@@ -38,7 +39,7 @@ body {
 
 /* --- Menu toolbar: search + category chips --- */
 .menu-toolbar {
-  max-width: 1100px;
+  max-width: var(--content-width);
   margin: 20px auto 0;
   padding: 0 20px;
   position: relative;
@@ -82,7 +83,7 @@ body {
 .menu.hidden { display: none; }
 .menu-item.hidden { display: none; }
 
-main { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
+main { max-width: var(--content-width); margin: 0 auto; padding: 40px 20px; }
 
 h2 {
   color: var(--orange-dark);
