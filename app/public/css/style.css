@@ -18,16 +18,14 @@ body {
 .hero {
   background: linear-gradient(135deg, var(--orange), var(--orange-dark));
   text-align: center;
-  padding: 24px 20px;
+  padding: 0;
 }
 .hero-banner {
   display: block;
-  margin: 0 auto;
-  width: 440px;
-  max-width: 100%;
+  width: 100%;
+  max-width: 1100px;
   height: auto;
-  border-radius: 14px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+  margin: 0 auto;
 }
 .sr-only {
   position: absolute;
@@ -41,7 +39,7 @@ body {
 /* --- Menu toolbar: search + category chips --- */
 .menu-toolbar {
   max-width: 1100px;
-  margin: -28px auto 0;
+  margin: 20px auto 0;
   padding: 0 20px;
   position: relative;
   z-index: 10;
