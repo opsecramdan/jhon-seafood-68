@@ -67,6 +67,50 @@
   document.addEventListener('DOMContentLoaded', function () {
     render();
 
+    // --- Category filter + search ---
+    let activeCategory = 'all';
+    const searchInput = document.getElementById('search-input');
+    const chips = document.querySelectorAll('.chip');
+    const sections = document.querySelectorAll('.menu[data-category-section]');
+    const noResults = document.getElementById('no-results');
+
+    function applyFilter() {
+      const query = (searchInput.value || '').trim().toLowerCase();
+      let anyVisible = false;
+
+      sections.forEach((section) => {
+        const sectionCategory = section.dataset.categorySection;
+        const categoryMatches = activeCategory === 'all' || activeCategory === sectionCategory;
+        let sectionHasVisibleItem = false;
+
+        section.querySelectorAll('.menu-item').forEach((item) => {
+          const searchText = item.dataset.search || '';
+          const searchMatches = !query || searchText.includes(query);
+          const visible = categoryMatches && searchMatches;
+          item.classList.toggle('hidden', !visible);
+          if (visible) sectionHasVisibleItem = true;
+        });
+
+        section.classList.toggle('hidden', !sectionHasVisibleItem);
+        if (sectionHasVisibleItem) anyVisible = true;
+      });
+
+      noResults.classList.toggle('hidden', anyVisible);
+    }
+
+    chips.forEach((chip) => {
+      chip.addEventListener('click', function () {
+        chips.forEach((c) => c.classList.remove('active'));
+        chip.classList.add('active');
+        activeCategory = chip.dataset.category;
+        applyFilter();
+      });
+    });
+
+    if (searchInput) {
+      searchInput.addEventListener('input', applyFilter);
+    }
+
     document.querySelectorAll('.btn-add-cart').forEach((btn) => {
       btn.addEventListener('click', function () {
         const item = btn.closest('.menu-item');
