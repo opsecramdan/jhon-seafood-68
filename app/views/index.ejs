@@ -11,7 +11,7 @@
 <header class="hero">
   <div class="logo">🦐</div>
   <h1>Jhon Seafood 68</h1>
-  <p class="tagline">Seafood segar, dimasak langsung dari pemesanan Anda — kini bisa dipesan online kapan saja.</p>
+  <p class="tagline">Seafood segar, dimasak langsung dari pemesanan Anda — pesan online kapan saja.</p>
 </header>
 
 <main>
@@ -20,17 +20,21 @@
     <p>
       Jhon Seafood 68 adalah rumah makan seafood keluarga yang melayani pelanggan dengan menu
       kerang, udang, cumi, ikan bakar, hingga kepiting segar. Sistem pemesanan kami kini
-      sudah bermigrasi ke cloud agar pelanggan dapat melihat menu kapan saja, di mana saja,
-      dengan data yang aman dan tersimpan di server yang andal.
+      sudah bermigrasi ke cloud agar pelanggan dapat melihat menu dan <strong>langsung memesan</strong>
+      kapan saja, di mana saja, dengan data yang aman dan tersimpan di server yang andal.
     </p>
   </section>
+
+  <% if (typeof orderError !== 'undefined' && orderError) { %>
+    <p class="error" style="max-width:1100px;margin:0 auto 20px;"><%= orderError %></p>
+  <% } %>
 
   <% Object.keys(grouped).forEach(category => { %>
   <section class="menu">
     <h2><%= category %></h2>
     <div class="menu-grid">
       <% grouped[category].forEach(p => { %>
-      <div class="menu-item">
+      <div class="menu-item" data-id="<%= p.id %>" data-name="<%= p.name %>" data-price="<%= p.price %>">
         <% if (p.image) { %>
           <img src="<%= p.image %>" alt="<%= p.name %>" class="menu-img">
         <% } else { %>
@@ -39,6 +43,10 @@
         <h3><%= p.name %></h3>
         <p class="desc"><%= p.description %></p>
         <span class="price">Rp <%= p.price.toLocaleString('id-ID') %></span>
+        <div class="order-controls">
+          <input type="number" min="1" value="1" class="qty-input">
+          <button type="button" class="btn-add-cart">+ Pesan</button>
+        </div>
       </div>
       <% }) %>
     </div>
@@ -51,11 +59,39 @@
   </section>
 </main>
 
+<!-- Floating cart button -->
+<button id="cart-fab" class="cart-fab" type="button">
+  🛒 <span id="cart-count">0</span> item &mdash; <span id="cart-total">Rp 0</span>
+</button>
+
+<!-- Cart / checkout panel -->
+<div id="cart-panel" class="cart-panel hidden">
+  <div class="cart-panel-inner">
+    <button id="cart-close" class="cart-close" type="button">&times;</button>
+    <h2>Keranjang Pesanan</h2>
+    <div id="cart-items"></div>
+    <p id="cart-empty" class="cart-empty">Keranjang masih kosong, pilih menu dulu ya.</p>
+
+    <form id="checkout-form" method="POST" action="/order">
+      <input type="hidden" name="items" id="items-input">
+      <label>Nama</label>
+      <input type="text" name="customer_name" required>
+      <label>No. HP / WhatsApp</label>
+      <input type="text" name="phone" required>
+      <label>Catatan (opsional)</label>
+      <textarea name="notes" rows="2" placeholder="Contoh: pedas sedang, alamat antar, dll."></textarea>
+      <div class="cart-total-row">Total: <strong id="cart-total-2">Rp 0</strong></div>
+      <button type="submit" id="checkout-btn" class="btn-primary" disabled>Pesan Sekarang</button>
+    </form>
+  </div>
+</div>
+
 <footer>
   <p><strong>Kelompok K-1 &mdash; Tugas Praktikum Cloud Computing</strong></p>
   <p>Deka Ramdoni &bull; Gopriadi &bull; Muhammad Daffa Cahyo Santoso &bull; Muhammad Ramadan</p>
   <p class="admin-link"><a href="/admin/login">Admin</a></p>
 </footer>
 
+<script src="/js/cart.js"></script>
 </body>
 </html>

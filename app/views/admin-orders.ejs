@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Pesanan Masuk - Jhon Seafood 68</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="admin-body">
+<header class="admin-header">
+  <h1>🦐 Jhon Seafood 68 — Pesanan</h1>
+  <div>
+    <span>Halo, <%= username %></span>
+    <form method="POST" action="/admin/logout" style="display:inline">
+      <button type="submit" class="btn-logout">Logout</button>
+    </form>
+  </div>
+</header>
+
+<main class="admin-main">
+  <div class="admin-toolbar">
+    <a href="/admin/dashboard" class="btn-secondary">&larr; Kelola Produk</a>
+  </div>
+
+  <% if (orders.length === 0) { %>
+    <p>Belum ada pesanan masuk.</p>
+  <% } %>
+
+  <% orders.forEach(o => { %>
+  <div class="order-card">
+    <div class="order-card-head">
+      <div>
+        <strong>#<%= o.id %> — <%= o.customer_name %></strong> (<%= o.phone %>)
+        <div class="order-date"><%= o.created_at %></div>
+      </div>
+      <form method="POST" action="/admin/orders/<%= o.id %>/status">
+        <select name="status" onchange="this.form.submit()">
+          <% ['Baru','Diproses','Selesai','Dibatalkan'].forEach(s => { %>
+            <option value="<%= s %>" <%= o.status === s ? 'selected' : '' %>><%= s %></option>
+          <% }) %>
+        </select>
+      </form>
+    </div>
+    <% if (o.notes) { %><p class="order-notes">Catatan: <%= o.notes %></p><% } %>
+    <table class="admin-table">
+      <thead><tr><th>Produk</th><th>Qty</th><th>Harga</th><th>Subtotal</th></tr></thead>
+      <tbody>
+        <% o.items.forEach(it => { %>
+        <tr>
+          <td><%= it.product_name %></td>
+          <td><%= it.qty %></td>
+          <td>Rp <%= it.price.toLocaleString('id-ID') %></td>
+          <td>Rp <%= (it.price * it.qty).toLocaleString('id-ID') %></td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+    <p class="order-total">Total: <strong>Rp <%= o.total.toLocaleString('id-ID') %></strong></p>
+  </div>
+  <% }) %>
+</main>
+</body>
+</html>

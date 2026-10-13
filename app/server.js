@@ -14,6 +14,29 @@ const DB_PATH = process.env.DB_PATH || path.join(__dirname, 'data', 'jhonseafood
 async function main() {
   await db.init(DB_PATH);
 
+  // Orders tables (for customer ordering, no login required)
+  db.run(`
+    CREATE TABLE IF NOT EXISTS orders (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      customer_name TEXT NOT NULL,
+      phone TEXT NOT NULL,
+      notes TEXT,
+      total INTEGER NOT NULL,
+      status TEXT NOT NULL DEFAULT 'Baru',
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+  db.run(`
+    CREATE TABLE IF NOT EXISTS order_items (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      order_id INTEGER NOT NULL,
+      product_id INTEGER,
+      product_name TEXT NOT NULL,
+      price INTEGER NOT NULL,
+      qty INTEGER NOT NULL
+    )
+  `);
+
   // Seed once if empty
   const count = db.get('SELECT COUNT(*) AS c FROM products').c;
   if (count === 0) {
@@ -91,6 +114,63 @@ async function main() {
     }
   });
 
+  // --- Order routes (public, no login required) ---
+  app.post('/order', (req, res) => {
+    const { customer_name, phone, notes, items } = req.body;
+
+    if (!customer_name || !phone || !items) {
+      return res.status(400).render('index', {
+        grouped: groupByCategory(db.all('SELECT * FROM products ORDER BY category, id')),
+        orderError: 'Nama, nomor HP, dan minimal 1 produk wajib diisi.',
+      });
+    }
+
+    let cart;
+    try {
+      cart = JSON.parse(items); // [{id, name, price, qty}, ...]
+    } catch (e) {
+      return res.status(400).send('Data pesanan tidak valid');
+    }
+    if (!Array.isArray(cart) || cart.length === 0) {
+      return res.status(400).send('Keranjang kosong');
+    }
+
+    const products = db.all('SELECT * FROM products');
+    const productMap = {};
+    for (const p of products) productMap[p.id] = p;
+
+    let total = 0;
+    const validItems = [];
+    for (const item of cart) {
+      const p = productMap[item.id];
+      if (!p) continue;
+      const qty = Math.max(1, parseInt(item.qty, 10) || 1);
+      total += p.price * qty;
+      validItems.push({ product_id: p.id, product_name: p.name, price: p.price, qty });
+    }
+    if (validItems.length === 0) return res.status(400).send('Produk tidak valid');
+
+    db.run('INSERT INTO orders (customer_name, phone, notes, total) VALUES (?, ?, ?, ?)', [
+      customer_name, phone, notes || '', total,
+    ]);
+    const order = db.get('SELECT * FROM orders ORDER BY id DESC LIMIT 1');
+
+    for (const it of validItems) {
+      db.run('INSERT INTO order_items (order_id, product_id, product_name, price, qty) VALUES (?, ?, ?, ?, ?)', [
+        order.id, it.product_id, it.product_name, it.price, it.qty,
+      ]);
+    }
+
+    res.render('order-confirmation', { order, items: validItems });
+  });
+
+  app.get('/order/:id', (req, res) => {
+    const order = db.get('SELECT * FROM orders WHERE id = ?', [req.params.id]);
+    if (!order) return res.status(404).send('Pesanan tidak ditemukan');
+    const items = db.all('SELECT * FROM order_items WHERE order_id = ?', [order.id]);
+    res.render('order-confirmation', { order, items });
+  });
+
   // --- Admin auth routes ---
   app.get('/admin/login', (req, res) => res.render('login', { error: null }));
 
@@ -158,6 +238,23 @@ async function main() {
     if (existing && existing.image) fs.unlink(path.join(__dirname, 'public', existing.image), () => {});
     db.run('DELETE FROM products WHERE id = ?', [req.params.id]);
     res.redirect('/admin/dashboard');
+  });
+
+  app.get('/admin/orders', requireAuth, (req, res) => {
+    const orders = db.all('SELECT * FROM orders ORDER BY created_at DESC');
+    for (const o of orders) {
+      o.items = db.all('SELECT * FROM order_items WHERE order_id = ?', [o.id]);
+    }
+    res.render('admin-orders', { orders, username: req.session.username });
+  });
+
+  app.post('/admin/orders/:id/status', requireAuth, (req, res) => {
+    const { status } = req.body;
+    const allowed = ['Baru', 'Diproses', 'Selesai', 'Dibatalkan'];
+    if (allowed.includes(status)) {
+      db.run('UPDATE orders SET status = ? WHERE id = ?', [status, req.params.id]);
+    }
+    res.redirect('/admin/orders');
   });
 
   app.listen(PORT, () => {

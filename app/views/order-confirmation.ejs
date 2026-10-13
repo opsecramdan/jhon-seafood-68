@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pesanan Diterima - Jhon Seafood 68</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<header class="hero">
+  <div class="logo">✅</div>
+  <h1>Pesanan Diterima!</h1>
+  <p class="tagline">Terima kasih, <%= order.customer_name %>. Pesanan kamu sudah kami catat.</p>
+</header>
+
+<main>
+  <section class="order-summary">
+    <h2>Ringkasan Pesanan #<%= order.id %></h2>
+    <p><strong>Nama:</strong> <%= order.customer_name %></p>
+    <p><strong>No. HP:</strong> <%= order.phone %></p>
+    <% if (order.notes) { %><p><strong>Catatan:</strong> <%= order.notes %></p><% } %>
+    <p><strong>Status:</strong> <span class="status-badge"><%= order.status %></span></p>
+
+    <table class="order-table">
+      <thead><tr><th>Produk</th><th>Qty</th><th>Harga</th><th>Subtotal</th></tr></thead>
+      <tbody>
+        <% items.forEach(it => { %>
+        <tr>
+          <td><%= it.product_name %></td>
+          <td><%= it.qty %></td>
+          <td>Rp <%= it.price.toLocaleString('id-ID') %></td>
+          <td>Rp <%= (it.price * it.qty).toLocaleString('id-ID') %></td>
+        </tr>
+        <% }) %>
+      </tbody>
+      <tfoot>
+        <tr><td colspan="3"><strong>Total</strong></td><td><strong>Rp <%= order.total.toLocaleString('id-ID') %></strong></td></tr>
+      </tfoot>
+    </table>
+
+    <p class="note">Tim kami akan segera menghubungi kamu lewat nomor HP yang terdaftar untuk konfirmasi pesanan.</p>
+    <a href="/" class="btn-primary">&larr; Kembali ke Menu</a>
+  </section>
+</main>
+
+<footer>
+  <p><strong>Kelompok K-1 &mdash; Tugas Praktikum Cloud Computing</strong></p>
+  <p>Deka Ramdoni &bull; Gopriadi &bull; Muhammad Daffa Cahyo Santoso &bull; Muhammad Ramadan</p>
+</footer>
+</body>
+</html>
