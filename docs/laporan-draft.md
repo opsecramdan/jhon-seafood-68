@@ -9,7 +9,7 @@
 ## Bab 1 Pendahuluan
 
 **Profil UMKM:** Jhon Seafood 68 adalah rumah makan keluarga yang menjual aneka olahan seafood
-(kerang, udang, cumi, ikan bakar, kepiting) dengan total 52 varian menu. Sebelumnya sistem
+(kerang, udang, cumi, ikan bakar, kepiting) dengan total 53 varian menu. Sebelumnya sistem
 pemesanan hanya tercatat manual di tempat usaha — pemilik tidak memiliki cara bagi pelanggan
 untuk melihat menu atau memesan dari luar lokasi, tidak ada backup data, dan tidak ada
 perkiraan biaya operasional digital.
@@ -63,14 +63,18 @@ bawaan yang lengkap.
 ### Diagram Arsitektur (deskripsi tekstual — gambarkan ulang sebagai diagram visual di laporan)
 
 ```
-[Pengguna / Pelanggan]           [Pemilik UMKM / Admin]
-        |                                |
-        |  HTTPS (443)                   |  HTTPS (443) + login admin
-        v                                v
+[Pengguna / Pelanggan]                      [Admin (multi-user)]
+        |                                           |
+        |  HTTPS (443) — lihat menu, pesan         |  HTTPS (443) — login admin
+        |  (tanpa login)                            |  (CRUD produk, kelola pesanan,
+        v                                           |   kelola admin, ganti password)
+        +-------------------------------------------+
+        v
    +---------------------------------------------+
    |         EC2 Instance (t3.micro)              |
    |         Region: ap-southeast-3 (Jakarta)      |
    |         Elastic IP: 16.79.143.87              |
+   |         Domain: jhon86.16-79-143-87.nip.io    |
    |                                               |
    |  +---------+     +------------------------+   |
    |  | Nginx   | --> | Node.js App (PM2)      |   |
@@ -79,11 +83,12 @@ bawaan yang lengkap.
    |  +---------+     +-----------+------------+   |
    |       ^                      |                |
    |  Let's Encrypt (nip.io)      v                |
-   |                        +-----------+           |
-   |                        | SQLite DB |           |
-   |                        | (1 tabel: |           |
-   |                        |  products)|           |
-   |                        +-----------+           |
+   |                  +-------------------------+  |
+   |                  | SQLite DB (sql.js)      |  |
+   |                  | - products              |  |
+   |                  | - orders, order_items   |  |
+   |                  | - admin_users           |  |
+   |                  +-------------------------+  |
    +---------------------------------------------+
         |
         v  (ingress dibatasi Security Group)
@@ -102,9 +107,9 @@ bawaan yang lengkap.
 | **Security Group** | Firewall di level instance — SSH (22) hanya dari IP admin, HTTP/HTTPS (80/443) terbuka publik |
 | **Nginx** | Reverse proxy ke aplikasi Node.js, sekaligus terminasi SSL/TLS |
 | **Let's Encrypt (Certbot)** | Penerbit sertifikat SSL gratis, domain `16-79-143-87.nip.io` (DNS gratis berbasis IP), auto-renew tiap 90 hari |
-| **Node.js + Express + EJS** | Aplikasi web: halaman publik (menu), admin panel (CRUD produk, upload gambar) |
+| **Node.js + Express + EJS** | Aplikasi web: halaman publik (menu + pemesanan tanpa login), admin panel (CRUD produk, kelola pesanan, kelola admin, ganti password) |
 | **PM2** | Process manager — auto-restart aplikasi jika crash, auto-start saat server reboot |
-| **SQLite (sql.js)** | Database embedded, satu tabel `products`, tanpa biaya layanan database terpisah |
+| **SQLite (sql.js)** | Database embedded — tabel `products`, `orders`/`order_items` (pemesanan pelanggan), `admin_users` (akun admin, password di-hash) |
 | **CloudWatch Alarm + SNS** | Memantau status EC2, mengirim notifikasi email ke pemilik/admin jika server down |
 | **AWS Budget** | Memantau biaya aktual, mengirim notifikasi email jika melebihi threshold $0,01 |
 | **IAM Users (4 role)** | Kontrol akses berbasis peran — lihat Bab 5 / `docs/access-matrix.md` |
@@ -130,14 +135,23 @@ Lihat `docs/screenshots/` untuk bukti visual tiap langkah.
    auto-restart saat reboot.
 9. **Konfigurasi Nginx** sebagai reverse proxy ke aplikasi (`:3000`), endpoint `/health` diteruskan
    langsung dari aplikasi (termasuk cek koneksi database). *(Screenshot: `05-health-endpoint.png`)*
-10. **Pemasangan SSL gratis** dengan Certbot + Let's Encrypt, domain `16-79-143-87.nip.io`,
+10. **Pemasangan SSL gratis** dengan Certbot + Let's Encrypt, domain `jhon86.16-79-143-87.nip.io`,
     HTTP otomatis redirect ke HTTPS, auto-renew dijadwalkan via systemd timer 2x/hari.
 11. **Monitoring**: AWS Budget alert $0,01 *(Screenshot: `03-budget-alert.png`)*, CloudWatch
     Alarm `StatusCheckFailed` terhubung ke SNS topic yang mengirim email ke pemilik/admin
     *(Screenshot: `04-cloudwatch-alarm.png`)*.
+12. **Fitur pemesanan online**: pelanggan menambahkan produk ke keranjang (localStorage),
+    mengisi nama + no. HP, submit pesanan tersimpan ke tabel `orders`/`order_items`, halaman
+    konfirmasi menampilkan ringkasan. Admin melihat & mengubah status pesanan di `/admin/orders`.
+13. **Navigasi kategori & pencarian** di halaman utama agar pelanggan mudah menemukan menu
+    dari 53 produk yang tersedia (filter kategori + search box real-time).
+14. **Multi-admin & keamanan akun aplikasi**: kredensial admin dipindah dari `.env` ke tabel
+    `admin_users` (password di-hash bcrypt), admin dapat menambah admin lain dan mengganti
+    password sendiri lewat `/admin/users` dan `/admin/profile`. Akses ke `/admin` tanpa login
+    otomatis diarahkan ke halaman login (tidak membocorkan struktur aplikasi).
 
 **Repository kode:** https://github.com/opsecramdan/jhon-seafood-68
-**URL aplikasi (production):** https://16-79-143-87.nip.io/
+**URL aplikasi (production):** https://jhon86.16-79-143-87.nip.io/
 
 ---
 
@@ -147,9 +161,13 @@ Lihat `docs/screenshots/` untuk bukti visual tiap langkah.
 
 Lihat detail lengkap di `docs/access-matrix.md`. Ringkasan: akses AWS dibagi 4 IAM user
 sesuai peran (least privilege), password policy kuat (12+ karakter, wajib reset di login
-pertama), SSH dibatasi 1 IP, admin panel aplikasi punya login terpisah dengan password
-di-hash (bcrypt) dan disimpan di `.env` (tidak pernah di-commit ke repository — lihat
-`.gitignore`).
+pertama), SSH dibatasi 1 IP. Admin panel aplikasi punya login terpisah (multi-admin
+didukung) — password di-hash (bcrypt) dan disimpan di tabel `admin_users` pada database,
+dapat dikelola langsung dari UI (`/admin/users` tambah/hapus admin, `/admin/profile` ganti
+password sendiri) tanpa perlu akses server. Rahasia sesi (`SESSION_SECRET`) tetap di `.env`
+(tidak pernah di-commit ke repository — lihat `.gitignore`). Akses ke `/admin` atau path
+admin yang tidak dikenal tanpa login otomatis diarahkan ke halaman login, tidak menampilkan
+pesan error yang membocorkan struktur aplikasi.
 
 ### Backup dan Uji Restore
 
