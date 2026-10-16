@@ -191,9 +191,9 @@ doc.add_paragraph()
 
 add_table(doc, ["NIM", "Nama", "Peran"], [
     ["241011700786", "Muhammad Ramadan", "Cloud Architect (Ketua)"],
-    ["241011700832", "Deka Ramdoni", "Infrastructure Engineer"],
+    ["241011701152", "Muhammad Daffa Cahyo Santoso", "Infrastructure Engineer"],
     ["241011701033", "Gopriadi", "Security & Governance Officer"],
-    ["241011701152", "Muhammad Daffa Cahyo Santoso", "Cost & Operations Analyst"],
+    ["241011700832", "Deka Ramdoni", "Cost & Operations Analyst"],
 ])
 
 for _ in range(3):

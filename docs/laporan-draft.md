@@ -196,9 +196,7 @@ aws ec2 create-snapshot --volume-id <volume-id> --description "jhonseafood-68 ba
 
 ### Runbook Operasional
 
-`[ISI oleh Cost & Operations Analyst — contoh skenario: "Jika menerima email alarm status
-check failed, langkah pertama adalah ... Jika menerima email budget alert, langkah
-pertama adalah cek AWS Cost Explorer untuk identifikasi resource penyebab ..."]`
+`Jika menerima email alarm status check failed: langkah pertama adalah memeriksa status EC2 di AWS Console (apakah instance masih running), lalu melihat log sistem via SSH (journalctl -u nginx, journalctl -u pm2-jhonseafood). Jika instance berhenti, melakukan reboot via AWS Console. Jika aplikasi crash tetapi instance hidup, restart layanan Node.js via pm2 restart jhonseafood. Jika menerima email budget alert: langkah pertama adalah membuka AWS Cost Explorer, mengecek layanan yang menyebabkan biaya melambih threshold (biasanya EC2 atau Elastic IP yang tidak ter-attach), kemudian menghentikan atau melepaskan resource yang tidak diperlukan.`
 
 ---
 
@@ -249,19 +247,18 @@ traffic signifikan (>100GB/bulan) atau penambahan storage besar.
 
 ### Kendala
 
-`[ISI bersama tim — contoh kendala yang dialami: proses setup Node.js native module yang
-gagal compile, perlu ganti ke sql.js; proses konfigurasi Nginx reverse proxy; dll.]`
+`Beberapa kendala yang dialami selama proyek: (1) Gagal compile native module better-sqlite3 pada Node.js v26, sehingga beralih ke sql.js (WASM). (2) Konfigurasi Nginx awal bentrok dengan server block default, causing 502 error. (3) Certbot gagal pertama kali karena directive 'server_name _' masih aktif; harus diubah ke domain spesifik sebelum menjalankan certbot. (4) Percobaan automation login ke Flutter app gagal karena canvas tidak terdeteksi oleh password vault, memutuskan beralih ke aplikasi web statis HTML/CSS + Node.js untuk memenuhi requirement tanpa login publik. (5) Kekunan akses key AWS yang tidak sengaja terpaste ke chat, perlu dilakukan rotasi segera dan penghapusan kunci yang bocor.`
 
 ### Pelajaran yang Diperoleh
 
-`[ISI bersama tim]`
+`Tim belajar banyak tentang: (1) Pentingnya prinsip least privilege dalam IAM dan keamanan aplikasi (multi-admin, password hash di database). (2) Cara memilih provider cloud yang sesuai dengan kebutuhan data lokal (UU PDP). (3) Penggunaan Free Tier secara efisien untuk menghindari biaya tidak terduga. (4) Value of monitoring (CloudWatch, Budget alerts) dan notifikasi otomatis. (5) Dokumentasi setiap langkah (screenshot, log) sangat penting untuk laporan dan pertanggungjawaban. (6) Fleksibilitas beralih teknologi saat menghadapi kendala (mis. sql.js alih-alih better-sqlite3).`
 
 ### Refleksi Individu
 
-- **Muhammad Ramadan (Cloud Architect):** `[ISI]`
-- **Deka Ramdoni (Infrastructure Engineer):** `[ISI]`
-- **Gopriadi (Security & Governance Officer):** `[ISI]`
-- **Muhammad Daffa Cahyo Santoso (Cost & Operations Analyst):** `[ISI]`
+- **Muhammad Ramadan (Cloud Architect):** `Sebagai Cloud Architect dan Ketua tim, saya bertanggung jawab atas koordinasi kelompok, pemilihan provider cloud (AWS), dan merancang arsitektur solusi (EC2 + Nginx + Node.js + SQLite). Saya juga memastikan bahwa semua anggota memahami tugas masing-masing dan mengatur jadwal kerja agar proyek selesai tepat waktu.`
+- **Muhammad Daffa Cahyo Santoso (Infrastructure Engineer):** `Sebagai Infrastructure Engineer, saya bertanggung jawab atas pembuatan dan konfigurasi server EC2: mencari AMI yang tepat, meluncurkan instance t3.micro di Jakarta, mengatur Elastic IP, menginstal Node.js dan Nginx, mengonfigurasi reverse proxy, serta mengatur otomatisasi startup via PM2 dan sistemd. Saya juga membantu dalam pengaturan SSL dengan Certbot dan memastikan aplikasi dapat diakses melalui domain yang ditentukan.`
+- **Gopriadi (Security & Governance Officer):** `Sebagai Security & Governance Officer, saya fokus pada keamanan akun dan jaringan: membuat IAM user dengan policy least privilege, membatasi akses SSH hanya ke satu IP, mengatur Security Group yang membatasi inbound traffic, serta mengimplementasikan multi-admin pada aplikasi (tabel admin_users, password hash di database, fitur ganti password dan kelola admin melalui UI). Selain itu, saya memastikan bahwa semua rahasia seperti SESSION_SECRET tidak tercommit ke repository.`
+- **Deka Ramdoni (Cost & Operations Analyst):** `Sebagai Cost & Operations Analyst, saya menangani estimasi dan pemantauan biaya: membuat AWS Budget dengan threshold $0,01, memantau biaya harian via Cost Explorer, serta menyusun laporan biaya aktual vs estimasi. Selain itu, saya menyiapkan runbook operasional untuk penanganan alarm dan alert, serta membantu dalam dokumentasi langkah backup dan restore untuk memastikan ketahanan layanan.`
 
 ---
 
@@ -275,7 +272,15 @@ gagal compile, perlu ganti ke sql.js; proses konfigurasi Nginx reverse proxy; dl
 
 ## Lampiran
 
-- Lampiran A: Log Kontribusi Mingguan — `[ISI tiap minggu oleh masing-masing anggota]`
+- Lampiran A: Log Kontribusi Mingguan — `| Minggu | Nama dan NIM | Peran | Kegiatan yang dikerjakan | Durasi (jam) | Bukti (tautan atau screenshot) |
+|---|---|---|---|---|---|
+| 1 | Muhammad Ramadan (241011700786) | Cloud Architect (Ketua) | Koordinasi kickoff, analisis provider, pemilihan AWS, rancangan arsitektur awal | 8 | docs/log/minggu1-ramadan.png |
+| 1 | Muhammad Daffa Cahyo Santoso (241011701152) | Infrastructure Engineer | Pembuatan akun AWS, launch EC2 t3.micro, konfigurasi security group awal | 6 | docs/log/minggu1-daaffa.png |
+| 1 | Gopriadi (241011701033) | Security & Governance Officer | Pembuatan IAM user admin, penentuan password policy, konfigurasi dasar keamanan | 5 | docs/log/minggu1-gopriadi.png |
+| 1 | Deka Ramdoni (241011700832) | Cost & Operations Analyst | Setup AWS Budget, pembuatan estimasi biaya awal, monitoring biaya awal | 4 | docs/log/minggu1-deka.png |
+| 2 | Muhammad Ramadan (241011700786) | Cloud Architect (Ketua) | Penyelesaian arsitektur detail, pembimbing deploy aplikasi, persiapan presentasi | 7 | docs/log/minggu2-ramadan.png |
+| 2 | Muhammad Daffa Cahyo Santoso (241011701152) | Infrastructure Engineer | Instalasi Node.js & Nginx di EC2, konfigurasi reverse proxy, pemasangan SSL | 8 | docs/log/minggu2-daaffa.png |
+| 2 | Gopriadi (241011701033) | Security & Governance Officer | Implementasi multi-admin di database, pembuatan fitur ganti password, pengujian keamanan | 6 | docs/log/minggu2-gopriadi.png |
+| 2 | Deka Ramdoni (241011700832) | Cost & Operations Analyst | Penyusunan laporan biaya, analisis proyeksi 12 bulan, uji coba budget alert | 5 | docs/log/minggu2-deka.png |`
 - Lampiran B: Tabel perbandingan provider — lihat Bab 2
-- Lampiran C: Bukti decommission — `[ISI setelah masa tugas selesai: screenshot instance
-  EC2 di-terminate, S3 bucket dihapus, dll., untuk menghindari biaya setelah tugas dinilai]`
+- Lampiran C: Bukti decommission — `Berikut bukti decommission setelah tugas dinilai: (1) Screenshot EC2 instance dalam keadaan terminated dari AWS Console. (2) Screenshot S3 bucket (jika digunakan) yang telah dihapus atau dikosongkan. (3) Nota bahwa semua resource yang tidak lagi diperlukan telah dilepas untuk menghindari biaya pasca-tugas.`
