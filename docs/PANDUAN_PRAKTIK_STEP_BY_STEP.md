@@ -14,18 +14,25 @@
 
 ## FASE 0 — Persiapan Akun AWS
 
-### Langkah 0.1 — Registrasi Akun AWS
-**Jika akun AWS sudah ada (akun lama yang dipakai sekarang), cukup screenshot halaman akun:**
-1. Login ke [AWS Console](https://console.aws.amazon.com)
+### Langkah 0.1 — Akun AWS
+
+> **Catatan:** Registrasi akun AWS baru WAJIB pakai kartu kredit/debit untuk
+> verifikasi (walau tetap $0 ditagih selama di Free Tier/kredit). Karena
+> kalian **sudah punya akun AWS** (akun yang sama dipakai untuk instance
+> yang sekarang berjalan), **TIDAK PERLU daftar ulang** — cukup dokumentasikan
+> akun yang sudah ada sebagai bukti kepemilikan. Mendaftar akun kedua hanya
+> menambah risiko verifikasi kartu tanpa manfaat untuk laporan ini.
+
+**Langkah dokumentasi akun existing:**
+1. Login ke [AWS Console](https://console.aws.amazon.com) dengan akun yang sudah ada
 2. Klik nama akun di kanan atas → **Account**
 3. Screenshot halaman yang menampilkan Account ID, nama akun, tanggal dibuat
 
 📸 **Screenshot:** `00-01-account-info.png`
 
-> Jika memang membuat akun BARU dari nol, screenshot tiap tahap sign-up
-> (email, password, info kartu — **blur/crop nomor kartu**, verifikasi telepon,
-> pemilihan Support Plan Free).
-> 📸 `00-02-signup-email.png`, `00-03-signup-verification.png`, `00-04-support-plan.png`
+> *(Bagian sign-up/kartu kredit TIDAK perlu di-screenshot ulang karena akun
+> sudah ada sejak sebelumnya — langkah ini hanya relevan kalau benar-benar
+> membuat akun AWS dari nol, yang TIDAK kita lakukan di sini.)*
 
 ### Langkah 0.2 — Cek Skema Free Tier / Kredit
 1. Buka **Billing and Cost Management** → **Credits** (atau **Free Tier** di sidebar)
