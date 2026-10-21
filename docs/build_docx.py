@@ -1,12 +1,13 @@
-import re, json
+import re, json, os
 from docx import Document
-from docx.shared import Mm, Pt, RGBColor
+from docx.shared import Mm, Pt, RGBColor, Inches
 from docx.enum.text import WD_LINE_SPACING
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 
 REPORT_MD = "/Users/macbook/ramdan/kampus/SEMESTER_5/CLOUD COMPUTING/jhon-seafood-68/docs/laporan-draft.md"
 OUT_DOCX = "/Users/macbook/ramdan/kampus/SEMESTER_5/CLOUD COMPUTING/jhon-seafood-68/docs/CC-Kel01-05SIFE001.docx"
+DOCS_DIR = os.path.dirname(REPORT_MD)
 
 with open(REPORT_MD, encoding="utf-8") as f:
     lines = f.read().split("\n")
@@ -31,6 +32,15 @@ while i < n:
         level = len(m.group(1))
         text = clean_inline(m.group(2))
         blocks.append({"type": "heading", "level": level, "text": text})
+        i += 1
+        continue
+    m = re.match(r'^!\[(.*?)\]\(([^)]+)\)$', stripped)
+    if m:
+        caption = clean_inline(m.group(1))
+        src = m.group(2).strip()
+        if not os.path.isabs(src):
+            src = os.path.join(DOCS_DIR, src)
+        blocks.append({"type": "image", "caption": caption, "src": src})
         i += 1
         continue
     if stripped.startswith('```'):
@@ -209,11 +219,18 @@ doc.add_page_break()
 
 # --- Body ---
 heading_level_map = {2: 1, 3: 2, 4: 3}
+current_chapter = 0
+image_counter = 0
+missing_images = []
 for b in body_blocks:
     t = b["type"]
     if t == "heading":
         lvl = heading_level_map.get(b["level"], 3)
         doc.add_heading(b["text"], level=lvl)
+        mchap = re.match(r'^Bab\s+(\d+)', b["text"])
+        if mchap:
+            current_chapter = int(mchap.group(1))
+            image_counter = 0
     elif t == "paragraph":
         doc.add_paragraph(b["text"])
     elif t == "code":
@@ -227,6 +244,41 @@ for b in body_blocks:
     elif t == "table":
         add_table(doc, b["header"], b["rows"])
         doc.add_paragraph()
+    elif t == "image":
+        src = b["src"]
+        if os.path.isfile(src):
+            image_counter += 1
+            # Resize/compress large screenshots before embedding to keep docx size reasonable
+            embed_src = src
+            try:
+                from PIL import Image
+                img = Image.open(src)
+                max_w = 1600
+                if img.width > max_w:
+                    ratio = max_w / img.width
+                    new_size = (max_w, int(img.height * ratio))
+                    img = img.resize(new_size, Image.LANCZOS)
+                tmp_path = f"/tmp/_docximg_{image_counter}_{os.path.basename(src)}"
+                if img.mode in ("RGBA", "P"):
+                    img = img.convert("RGB")
+                img.save(tmp_path, "JPEG", quality=78, optimize=True)
+                embed_src = tmp_path
+            except Exception:
+                embed_src = src
+            p = doc.add_paragraph()
+            p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            run = p.add_run()
+            run.add_picture(embed_src, width=Inches(5.8))
+            cap = doc.add_paragraph()
+            cap.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            cap_run = cap.add_run(f"Gambar {current_chapter}.{image_counter} — {b['caption']}")
+            cap_run.italic = True
+            cap_run.font.size = Pt(10)
+            cap.paragraph_format.space_after = Pt(12)
+        else:
+            missing_images.append(src)
+            p = doc.add_paragraph(f"[GAMBAR TIDAK DITEMUKAN: {src}]")
+            p.runs[0].font.color.rgb = RGBColor(0xC0, 0x00, 0x00)
 
 # --- Footer: page numbers ---
 from docx.oxml.ns import qn as _qn
@@ -258,4 +310,4 @@ footer_para.add_run(" dari ")
 add_field(footer_para, " NUMPAGES ", "1")
 
 doc.save(OUT_DOCX)
-print(json.dumps({"ok": True, "output": OUT_DOCX, "blocks": len(body_blocks)}))
+print(json.dumps({"ok": True, "output": OUT_DOCX, "blocks": len(body_blocks), "missing_images": missing_images, "images_embedded": sum(1 for b in body_blocks if b["type"] == "image" and b["src"] not in missing_images)}))
